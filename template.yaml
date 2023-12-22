@@ -34,7 +34,6 @@ Resources:
       UserPoolId: !Ref CognitoAuthorizerUserPool
       ExplicitAuthFlows:
         - USER_PASSWORD_AUTH
-        - ADMIN_NO_SRP_AUTH
 
   # ---
   MvpRestApi:
@@ -533,7 +532,7 @@ Resources:
 
   # SECTION BLE
 
-  CreatePet:
+  CreateBle:
     Type: AWS::Serverless::Function
     Properties:
       CodeUri: ble/
@@ -550,6 +549,26 @@ Resources:
           Properties:
             Method: POST
             Path: /tags
+            RestApiId: 
+              !Ref MvpRestApi
+
+  UpdateBle:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: ble/
+      Handler: update.lambda_handler
+      Environment:
+        Variables:
+          BLETagsTable: !Ref BLETagsTable
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref BLETagsTable
+      Events:
+        Auth:
+          Type: Api
+          Properties:
+            Method: PUT
+            Path: /tags/{tagMac}
             RestApiId: 
               !Ref MvpRestApi
   # ---

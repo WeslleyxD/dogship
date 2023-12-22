@@ -42,15 +42,14 @@ def lambda_handler(event, context):
         }
         
     try:
-        resp = idp.admin_initiate_auth(
-                UserPoolId=environ["UserPoolId"],
-                ClientId=environ["ClientId"],
-                AuthFlow='REFRESH_TOKEN_AUTH',
-                AuthParameters={
-                    "USERNAME": username,
-                    "PASSWORD": password
-                }
-            )
+        resp = idp.initiate_auth(
+            ClientId=environ["ClientId"],
+            AuthFlow='USER_PASSWORD_AUTH',
+            AuthParameters={
+                "USERNAME": username,
+                "PASSWORD": password
+            }
+        )
 
         return {
             "statusCode": 200,

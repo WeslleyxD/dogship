@@ -17,7 +17,7 @@ architecture = "arm64"
 handler = "create.lambda_handler"
 manifest_hash = ""
 packagetype = "Zip"
-functions = ["UpdatePet", "ListPets", "DetailPet", "DeletePet", "AssociateTutorPet", "RemoveAssociateTutorPet", "AssociateResponsiblePet", "RemoveAssociateResponsiblePet"]
+functions = ["CreatePet", "UpdatePet", "ListPets", "DetailPet", "DeletePet", "AssociateTutorPet", "RemoveAssociateTutorPet", "AssociateResponsiblePet", "RemoveAssociateResponsiblePet"]
 
 [function_build_definitions.8b20e60e-27a2-4566-9633-00f4261574ca]
 codeuri = "/home/weslley/Projects/Back/backend-mvp/people"
@@ -35,6 +35,6 @@ architecture = "arm64"
 handler = "create.lambda_handler"
 manifest_hash = ""
 packagetype = "Zip"
-functions = ["CreatePet"]
+functions = ["CreateBle", "UpdateBle"]
 
 [layer_build_definitions]
