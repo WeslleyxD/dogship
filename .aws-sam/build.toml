@@ -35,6 +35,6 @@ architecture = "arm64"
 handler = "create.lambda_handler"
 manifest_hash = ""
 packagetype = "Zip"
-functions = ["CreateBle", "UpdateBle", "UpdateBleBatteryLevel", "ListBle", "DetailBle", "DeleteBle", "AssociateBlePet"]
+functions = ["CreateBle", "UpdateBle", "UpdateBleBatteryLevel", "ListBle", "DetailBle", "DeleteBle", "AssociateBlePet", "RemoveAssociateBlePet"]
 
 [layer_build_definitions]

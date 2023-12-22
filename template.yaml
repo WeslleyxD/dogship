@@ -673,6 +673,26 @@ Resources:
             Path: /tags/associate
             RestApiId: 
               !Ref MvpRestApi
+
+  RemoveAssociateBlePet:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: ble/
+      Handler: removeAssociatePet.lambda_handler
+      Environment:
+        Variables:
+          BLETagsTable: !Ref BLETagsTable
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref BLETagsTable
+      Events:
+        Auth:
+          Type: Api
+          Properties:
+            Method: POST
+            Path: /tags/disassociate/{tagMac}
+            RestApiId: 
+              !Ref MvpRestApi
   # ---
 
 
