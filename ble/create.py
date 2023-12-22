@@ -38,7 +38,7 @@ def lambda_handler(event, context):
         params = {
             "TableName": environ["BLETagsTable"],
             "ConditionExpression": "attribute_not_exists(tagMac)",
-            "Item": {k: TypeSerializer().serialize(str(v)) for k,v in body.items()}
+            "Item": {k: TypeSerializer().serialize(str(v)) if isinstance(v, float) else TypeSerializer().serialize(v) for k, v in body.items()}
         }
 
         # Criando um novo item na tabela

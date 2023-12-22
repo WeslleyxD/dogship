@@ -2,6 +2,7 @@ import json
 import boto3
 import logging
 from os import environ
+from datetime import datetime
 from boto3.dynamodb.types import TypeSerializer
 
 logger = logging.getLogger()
@@ -29,11 +30,15 @@ def lambda_handler(event, context):
             }),
     }
 
+    dt_now = datetime.now().strftime("%Y-%m-%dT%H:%M:%S.%fZ")
+    body.update({"createdAt": dt_now})
+    body.update({"updatedAt": dt_now})
+
     try:
         params = {
             "TableName": environ["GatewayTable"],
             "ConditionExpression": "attribute_not_exists(mac_gateway)",
-            "Item": {k: TypeSerializer().serialize(str(v)) for k,v in body.items()}
+            "Item": {k: TypeSerializer().serialize(str(v)) if isinstance(v, float) else TypeSerializer().serialize(v) for k, v in body.items()}
         }
 
         # Criando um novo item na tabela

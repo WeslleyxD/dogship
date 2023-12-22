@@ -3,6 +3,7 @@ import boto3
 import logging
 from os import environ
 from uuid import uuid4
+from datetime import datetime
 from boto3.dynamodb.types import TypeSerializer
 
 # import requests
@@ -34,11 +35,14 @@ def lambda_handler(event, context):
     }
 
     body.update({"petId": str(uuid4())})
+    dt_now = datetime.now().strftime("%Y-%m-%dT%H:%M:%S.%fZ")
+    body.update({"createdAt": dt_now})
+    body.update({"updatedAt": dt_now})
     try:
         params = {
             "TableName": environ["PetsTable"],
             "ConditionExpression": "attribute_not_exists(petId)",
-            "Item": {k: TypeSerializer().serialize(str(v)) for k,v in body.items()}
+            "Item": {k: TypeSerializer().serialize(str(v)) if isinstance(v, float) else TypeSerializer().serialize(v) for k, v in body.items()}
         }
 
         # Criando um novo item na tabela

@@ -2,9 +2,9 @@ import json
 import boto3
 import logging
 from os import environ
+from datetime import datetime
 from boto3.dynamodb.types import TypeSerializer
 
-# import requests
 
 logger = logging.getLogger()
 session = boto3.Session()
@@ -31,6 +31,8 @@ def lambda_handler(event, context):
                "error": "body not found",
             }),
     }
+
+    body.update({"updatedAt": datetime.now().strftime("%Y-%m-%dT%H:%M:%S.%fZ")})
 
     expression_attribute_names = {}
     expression_attribute_values = {}
