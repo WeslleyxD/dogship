@@ -24,7 +24,7 @@ def lambda_handler(event, context):
 
     params = {
         "TableName": environ["BLETagsTable"],
-        "Key": {'petId': {'S': event['pathParameters']['tagMac']}}
+        "Key": {'tagMac': {'S': event['pathParameters']['tagMac']}}
     }
 
     try:

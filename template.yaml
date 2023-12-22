@@ -630,11 +630,13 @@ Resources:
           Type: Api
           Properties:
             Method: GET
-            Path: /tag/{tagMac}
+            Path: /tags/{tagMac}
             RestApiId: 
               !Ref MvpRestApi
             RequestParameters:
-              - method.request.path.tagMac
+              - method.request.path.tagMac:
+                  Required: true
+
 
   # ---
 
