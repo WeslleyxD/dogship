@@ -12,7 +12,7 @@ ddb = session.client("dynamodb")
 
 
 def lambda_handler(event, context):
-    print (event)
+    logger.info(event)
 
     if event["httpMethod"].upper() not in ("GET", ):
         return {
@@ -30,11 +30,9 @@ def lambda_handler(event, context):
     try:
         resp = ddb.get_item(**params)
 
-        print (resp)
-
         return {
             "statusCode": 200,
-            "body": json.dumps({k: TypeDeserializer().deserialize(v) for k, v in resp["Item"].items()}),
+            "body": json.dumps({k: TypeDeserializer().deserialize(v) for k, v in resp["Item"].items()}, default=str),
         }
 
     except Exception as e:

@@ -11,7 +11,7 @@ idp = session.client('cognito-idp')
 
 
 def lambda_handler(event, context):
-    print (event)
+    logger.info(event)
 
     if event["httpMethod"].upper() not in ("POST", ):
         return {

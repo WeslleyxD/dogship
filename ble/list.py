@@ -12,7 +12,7 @@ ddb = session.client("dynamodb")
 
 
 def lambda_handler(event, context):
-    print (event)
+    logger.info(event)
 
     if event["queryStringParameters"] and event["queryStringParameters"].get("status", "").lower() not in ("all", "associated", "not_associated", ):
         return {

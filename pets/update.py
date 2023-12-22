@@ -12,7 +12,7 @@ ddb = session.client("dynamodb")
 
 
 def lambda_handler(event, context):
-    print (event)
+    logger.info(event)
 
     if event["httpMethod"].upper() not in ("PUT", ):
         return {

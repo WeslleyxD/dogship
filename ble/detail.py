@@ -23,22 +23,16 @@ def lambda_handler(event, context):
         } 
 
     params = {
-        "TableName": environ["PetsTable"],
+        "TableName": environ["BLETagsTable"],
+        "Key": {'petId': {'S': event['pathParameters']['tagMac']}}
     }
 
-    items = []
     try:
-        resp = ddb.scan(**params)
-        items.extend(resp.get("Items", []))
-
-        while "LastEvaluatedKey" in resp:
-            params.update({"ExclusiveStartKey": resp["LastEvaluatedKey"]})
-            resp = ddb.scan(**params)
-            items.extend(resp.get("Items", []))
+        resp = ddb.get_item(**params)
 
         return {
             "statusCode": 200,
-            "body": json.dumps([{k: TypeDeserializer().deserialize(v) for k, v in item.items()} for item in items], default=str),
+            "body": json.dumps({k: TypeDeserializer().deserialize(v) for k, v in resp["Item"].items()}, default=str),
         }
 
     except Exception as e:
