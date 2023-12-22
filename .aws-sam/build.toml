@@ -82,4 +82,13 @@ manifest_hash = ""
 packagetype = "Zip"
 functions = ["CreateTagStatus", "ListTagStatus", "ListTagStatusByTag"]
 
+[function_build_definitions.6d27a9c7-2c80-4037-8eda-aec79aeb8c87]
+codeuri = "/home/weslley/Projects/Back/backend-mvp/accelerometer"
+runtime = "python3.11"
+architecture = "arm64"
+handler = "create.lambda_handler"
+manifest_hash = ""
+packagetype = "Zip"
+functions = ["CreateAccelerometer"]
+
 [layer_build_definitions]

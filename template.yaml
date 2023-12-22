@@ -146,10 +146,10 @@ Resources:
           Projection:
             ProjectionType: ALL
 
-  AccelerometerDataTable:
+  AccelerometerTable:
     Type: AWS::DynamoDB::Table
     Properties:
-      TableName: AccelerometerDataTable
+      TableName: AccelerometerTable
       BillingMode: PAY_PER_REQUEST
       AttributeDefinitions:
         - AttributeName: tagMac
@@ -1117,7 +1117,31 @@ Resources:
             Path: /tagStatus/{tagMac}
             RestApiId: 
               !Ref MvpRestApi
+  # ---
 
+
+  # SECTION ACCELEROMETER
+
+  CreateAccelerometer:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: accelerometer/
+      Handler: create.lambda_handler
+      Environment:
+        Variables:
+          AccelerometerTable: !Ref AccelerometerTable
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref AccelerometerTable
+      Events:
+        Auth:
+          Type: Api
+          Properties:
+            Method: POST
+            Path: /accelerometerData
+            RestApiId: 
+              !Ref MvpRestApi
+  # ---
 
 Outputs:
   CognitoAuthorizerUserPool:
