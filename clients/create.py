@@ -2,6 +2,7 @@ import json
 import boto3
 import logging
 from os import environ
+from uuid import uuid4
 from boto3.dynamodb.types import TypeSerializer
 
 # import requests
@@ -34,8 +35,8 @@ def lambda_handler(event, context):
 
     try:
         params = {
-            "TableName": environ["PersonTable"],
-            "ConditionExpression": "attribute_not_exists(personId)",
+            "TableName": environ["ClientsTable"],
+            "ConditionExpression": "attribute_not_exists(cnpj)",
             "Item": {k: TypeSerializer().serialize(str(v)) for k,v in body.items()}
         }
 
@@ -44,7 +45,7 @@ def lambda_handler(event, context):
 
         return {
             "statusCode": 200,
-            "body": json.dumps("people created successfully"),
+            "body": json.dumps("client created successfully"),
         }
 
     except Exception as e:

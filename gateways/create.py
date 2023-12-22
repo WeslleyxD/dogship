@@ -33,7 +33,7 @@ def lambda_handler(event, context):
         params = {
             "TableName": environ["GatewayTable"],
             "ConditionExpression": "attribute_not_exists(mac_gateway)",
-            "Item": {k: TypeSerializer().serialize(v) for k,v in body.items()}
+            "Item": {k: TypeSerializer().serialize(str(v)) for k,v in body.items()}
         }
 
         # Criando um novo item na tabela

@@ -46,4 +46,13 @@ manifest_hash = ""
 packagetype = "Zip"
 functions = ["CreateGateway", "UpdateGateway", "ListGateways", "DetailGateway", "DeleteGateway"]
 
+[function_build_definitions.3e2a3488-732f-4cfb-83bd-a27874e74b0f]
+codeuri = "/home/weslley/Projects/Back/backend-mvp/clients"
+runtime = "python3.11"
+architecture = "arm64"
+handler = "update.lambda_handler"
+manifest_hash = ""
+packagetype = "Zip"
+functions = ["CreateClient", "UpdateClient", "ListClients", "DetailClient", "DeleteClient"]
+
 [layer_build_definitions]

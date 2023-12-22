@@ -73,7 +73,6 @@ Resources:
         - AttributeName: personId
           KeyType: HASH
 
-
   BLETagsTable:
     Type: AWS::DynamoDB::Table
     Properties:
@@ -792,7 +791,114 @@ Resources:
             Path: /gateways/{mac_gateway}
             RestApiId: 
               !Ref MvpRestApi
- # ---
+  # ---
+
+  # SECTION CLIENTS
+
+  CreateClient:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: clients/
+      Handler: create.lambda_handler
+      Environment:
+        Variables:
+          ClientsTable: !Ref ClientsTable
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref ClientsTable
+      Events:
+        Auth:
+          Type: Api
+          Properties:
+            Method: POST
+            Path: /clients
+            RestApiId: 
+              !Ref MvpRestApi
+
+  UpdateClient:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: clients/
+      Handler: update.lambda_handler
+      Environment:
+        Variables:
+          ClientsTable: !Ref ClientsTable
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref ClientsTable
+      Events:
+        Auth:
+          Type: Api
+          Properties:
+            Method: PUT
+            Path: /clients/{cnpj}
+            RestApiId: 
+              !Ref MvpRestApi
+  
+  ListClients:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: clients/
+      Handler: list.lambda_handler
+      Environment:
+        Variables:
+          ClientsTable: !Ref ClientsTable
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref ClientsTable
+      Events:
+        Auth:
+          Type: Api
+          Properties:
+            Method: GET
+            Path: /clients
+            RestApiId: 
+              !Ref MvpRestApi
+
+  DetailClient:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: clients/
+      Handler: detail.lambda_handler
+      Environment:
+        Variables:
+          ClientsTable: !Ref ClientsTable
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref ClientsTable
+      Events:
+        Auth:
+          Type: Api
+          Properties:
+            Method: GET
+            Path: /clients/{cnpj}
+            RestApiId: 
+              !Ref MvpRestApi
+
+  DeleteClient:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: clients/
+      Handler: delete.lambda_handler
+      Environment:
+        Variables:
+          ClientsTable: !Ref ClientsTable
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref ClientsTable
+      Events:
+        Auth:
+          Type: Api
+          Properties:
+            Method: DELETE
+            Path: /clients/{cnpj}
+            RestApiId: 
+              !Ref MvpRestApi
+
+
+  # ---
+
+
 
 Outputs:
   CognitoAuthorizerUserPool:

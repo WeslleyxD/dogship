@@ -2,6 +2,7 @@ import json
 import boto3
 import logging
 from os import environ
+from uuid import uuid4
 from boto3.dynamodb.types import TypeSerializer
 
 # import requests
@@ -14,7 +15,7 @@ ddb = session.client("dynamodb")
 def lambda_handler(event, context):
     logger.info(event)
 
-    if event["httpMethod"].upper() not in ("POST", ):
+    if event["httpMethod"].upper() not in ("DELETE", ):
         return {
             "statusCode": 400,
             "body": json.dumps({
@@ -22,29 +23,19 @@ def lambda_handler(event, context):
             }),
         } 
 
-    body = json.loads(event["body"]) if "body" in event and event.get("body") else None
-
-    if not body:
-        return {
-            "statusCode": 500,
-            "body": json.dumps({
-               "error": "body not found",
-            }),
-    }
-
     try:
         params = {
-            "TableName": environ["PersonTable"],
-            "ConditionExpression": "attribute_not_exists(personId)",
-            "Item": {k: TypeSerializer().serialize(str(v)) for k,v in body.items()}
+            "TableName": environ["ClientsTable"],
+            "ConditionExpression": "attribute_exists(cnpj)",
+            "Key": {'cnpj': {'S': event['pathParameters']['cnpj']}}
         }
 
         # Criando um novo item na tabela
-        response = ddb.put_item(**params)
+        response = ddb.delete_item(**params)
 
         return {
             "statusCode": 200,
-            "body": json.dumps("people created successfully"),
+            "body": json.dumps("client deleted successfully"),
         }
 
     except Exception as e:
