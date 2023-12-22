@@ -591,6 +591,29 @@ Resources:
             Path: /tags/{tagMac}/battery
             RestApiId: 
               !Ref MvpRestApi
+
+  ListBle:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: ble/
+      Handler: list.lambda_handler
+      Environment:
+        Variables:
+          BLETagsTable: !Ref BLETagsTable
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref BLETagsTable
+      Events:
+        Auth:
+          Type: Api
+          Properties:
+            Method: GET
+            Path: /tags
+            RestApiId: 
+              !Ref MvpRestApi
+            RequestParameters:
+              - method.request.querystring.status
+
   # ---
 
 

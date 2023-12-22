@@ -14,6 +14,14 @@ ddb = session.client("dynamodb")
 def lambda_handler(event, context):
     print (event)
 
+    if event["queryStringParameters"] and event["queryStringParameters"].get("status", "").lower() not in ("all", "associated", "not_associated", ):
+        return {
+            "statusCode": 400,
+            "body": json.dumps({
+               "error": "query parameter status invalid (all, associated, not_associated)",
+            }),
+        }
+
     if event["httpMethod"].upper() not in ("GET", ):
         return {
             "statusCode": 400,
@@ -23,8 +31,15 @@ def lambda_handler(event, context):
         } 
 
     params = {
-        "TableName": environ["PetsTable"],
+        "TableName": environ["BLETagsTable"],
     }
+
+    if event["queryStringParameters"]:
+        match event["queryStringParameters"].get("status", "").lower():
+            case "associated":
+                params.update({"FilterExpression": "attribute_exists(petId)"})
+            case "not_associated":
+                params.update({"FilterExpression": "attribute_not_exists(petId)"})
 
     items = []
     try:
