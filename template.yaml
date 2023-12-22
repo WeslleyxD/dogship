@@ -162,10 +162,10 @@ Resources:
         - AttributeName: timestamp
           KeyType: RANGE
 
-  TagStatusDataTable:
+  TagStatusTable:
     Type: AWS::DynamoDB::Table
     Properties:
-      TableName: TagStatusDataTable
+      TableName: TagStatusTable
       BillingMode: PAY_PER_REQUEST
       AttributeDefinitions:
         - AttributeName: tagMac
@@ -1055,6 +1055,68 @@ Resources:
             RestApiId: 
               !Ref MvpRestApi
   # ---
+
+  # SECTION TAGSTATUS
+
+  CreateTagStatus:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: tagstatus/
+      Handler: create.lambda_handler
+      Environment:
+        Variables:
+          TagStatusTable: !Ref TagStatusTable
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref TagStatusTable
+      Events:
+        Auth:
+          Type: Api
+          Properties:
+            Method: POST
+            Path: /tagStatus
+            RestApiId: 
+              !Ref MvpRestApi
+
+  ListTagStatus:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: tagstatus/
+      Handler: list.lambda_handler
+      Environment:
+        Variables:
+          TagStatusTable: !Ref TagStatusTable
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref TagStatusTable
+      Events:
+        Auth:
+          Type: Api
+          Properties:
+            Method: GET
+            Path: /tagStatus
+            RestApiId: 
+              !Ref MvpRestApi
+
+  ListTagStatusByTag:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: tagstatus/
+      Handler: listbytag.lambda_handler
+      Environment:
+        Variables:
+          TagStatusTable: !Ref TagStatusTable
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref TagStatusTable
+      Events:
+        Auth:
+          Type: Api
+          Properties:
+            Method: GET
+            Path: /tagStatus/{tagMac}
+            RestApiId: 
+              !Ref MvpRestApi
 
 
 Outputs:

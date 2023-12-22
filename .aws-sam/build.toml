@@ -73,4 +73,13 @@ manifest_hash = ""
 packagetype = "Zip"
 functions = ["CreateTagHistory", "ListTagHistory"]
 
+[function_build_definitions.21e53532-2a16-48c3-ae39-fa760effb0f1]
+codeuri = "/home/weslley/Projects/Back/backend-mvp/tagstatus"
+runtime = "python3.11"
+architecture = "arm64"
+handler = "create.lambda_handler"
+manifest_hash = ""
+packagetype = "Zip"
+functions = ["CreateTagStatus", "ListTagStatus", "ListTagStatusByTag"]
+
 [layer_build_definitions]

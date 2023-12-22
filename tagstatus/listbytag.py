@@ -23,17 +23,20 @@ def lambda_handler(event, context):
         } 
 
     params = {
-        "TableName": environ["SectorsTable"],
+        "TableName": environ["TagStatusTable"],
+        "KeyConditionExpression": "#N1 = :V1",
+        "ExpressionAttributeNames": {"#N1": "tagMac"},
+        "ExpressionAttributeValues": {":V1": {"S": event['pathParameters']['tagMac']}}
     }
 
     items = []
     try:
-        resp = ddb.scan(**params)
+        resp = ddb.query(**params)
         items.extend(resp.get("Items", []))
 
         while "LastEvaluatedKey" in resp:
             params.update({"ExclusiveStartKey": resp["LastEvaluatedKey"]})
-            resp = ddb.scan(**params)
+            resp = ddb.query(**params)
             items.extend(resp.get("Items", []))
 
         return {
@@ -46,6 +49,6 @@ def lambda_handler(event, context):
         return {
             "statusCode": 500,
             "body": json.dumps({
-               "error": str(e),
+            "error": str(e),
             }),
         }

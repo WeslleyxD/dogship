@@ -23,7 +23,7 @@ def lambda_handler(event, context):
         } 
 
     params = {
-        "TableName": environ["SectorsTable"],
+        "TableName": environ["TagStatusTable"],
     }
 
     items = []

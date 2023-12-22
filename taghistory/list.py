@@ -48,7 +48,7 @@ def lambda_handler(event, context):
 
                 return {
                     "statusCode": 200,
-                    "body": json.dumps([{k: TypeDeserializer().deserialize(v) for k, v in item.items()} for item in items], default=str),
+                    "body": json.dumps([{k: TypeDeserializer().deserialize(str(v)) if isinstance(v, float) else TypeDeserializer().deserialize(v) for k, v in item.items()} for item in items], default=str),
                 }
 
             except Exception as e:
@@ -78,7 +78,7 @@ def lambda_handler(event, context):
 
                 return {
                     "statusCode": 200,
-                    "body": json.dumps([{k: TypeDeserializer().deserialize(v) for k, v in item.items()} for item in items], default=str),
+                    "body": json.dumps([{k: TypeDeserializer().deserialize(str(v)) if isinstance(v, float) else TypeDeserializer().deserialize(v) for k, v in item.items()} for item in items], default=str),
                 }
 
             except Exception as e:
@@ -106,7 +106,7 @@ def lambda_handler(event, context):
 
                 return {
                     "statusCode": 200,
-                    "body": json.dumps([{k: TypeDeserializer().deserialize(v) for k, v in item.items()} for item in items], default=str),
+                    "body": json.dumps([{k: TypeDeserializer().deserialize(str(v)) if isinstance(v, float) else TypeDeserializer().deserialize(v) for k, v in item.items()} for item in items], default=str),
                 }
 
             except Exception as e:
@@ -130,7 +130,7 @@ def lambda_handler(event, context):
 
             return {
                 "statusCode": 200,
-                "body": json.dumps([{k: TypeDeserializer().deserialize(v) for k, v in item.items()} for item in items], default=str),
+                "body": json.dumps([{k: TypeDeserializer().deserialize(str(v)) if isinstance(v, float) else TypeDeserializer().deserialize(v) for k, v in item.items()} for item in items], default=str),
             }
 
         except Exception as e:
