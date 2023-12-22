@@ -754,6 +754,26 @@ Resources:
             RestApiId: 
               !Ref MvpRestApi
 
+  DetailGateway:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: gateways/
+      Handler: detail.lambda_handler
+      Environment:
+        Variables:
+          GatewayTable: !Ref GatewayTable
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref GatewayTable
+      Events:
+        Auth:
+          Type: Api
+          Properties:
+            Method: GET
+            Path: /gateways/{mac_gateway}
+            RestApiId: 
+              !Ref MvpRestApi
+
  # ---
 
 

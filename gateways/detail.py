@@ -23,8 +23,8 @@ def lambda_handler(event, context):
         } 
 
     params = {
-        "TableName": environ["PersonTable"],
-        "Key": {'personId': {'S': event['pathParameters']['personId']}}
+        "TableName": environ["GatewayTable"],
+        "Key": {'mac_gateway': {'S': event['pathParameters']['mac_gateway']}}
     }
 
     try:
