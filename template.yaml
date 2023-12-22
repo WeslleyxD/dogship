@@ -529,12 +529,29 @@ Resources:
             Path: /people/{personId}
             RestApiId: 
               !Ref MvpRestApi
-            RequestParameters:
-              - method.request.header.Authorization:
-                  Required: true
-                  Caching: true
-              - method.request.path.personId:
-                  Required: true
+  # ---
+
+  # SECTION BLE
+
+  CreatePet:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: ble/
+      Handler: create.lambda_handler
+      Environment:
+        Variables:
+          BLETagsTable: !Ref BLETagsTable
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref BLETagsTable
+      Events:
+        Auth:
+          Type: Api
+          Properties:
+            Method: POST
+            Path: /tags
+            RestApiId: 
+              !Ref MvpRestApi
   # ---
 
 

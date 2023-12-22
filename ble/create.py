@@ -2,12 +2,14 @@ import json
 import boto3
 import logging
 from os import environ
+from uuid import uuid4
+from boto3.dynamodb.types import TypeSerializer
 
 # import requests
 
 logger = logging.getLogger()
 session = boto3.Session()
-idp = session.client('cognito-idp')
+ddb = session.client("dynamodb")
 
 
 def lambda_handler(event, context):
@@ -30,31 +32,21 @@ def lambda_handler(event, context):
                "error": "body not found",
             }),
     }
-    username = body.get("Username")
-    password = body.get("Password")
 
-    if not username or not password:
-        return {
-            "statusCode": 500,
-            "body": json.dumps({
-               "error": "Username or Password in body not found",
-            }),
-        }
-        
+    body.update({"petId": str(uuid4())})
     try:
-        resp = idp.admin_initiate_auth(
-                UserPoolId=environ["UserPoolId"],
-                ClientId=environ["ClientId"],
-                AuthFlow='REFRESH_TOKEN_AUTH',
-                AuthParameters={
-                    "USERNAME": username,
-                    "PASSWORD": password
-                }
-            )
+        params = {
+            "TableName": environ["BLETagsTable"],
+            "ConditionExpression": "attribute_not_exists(tagMac)",
+            "Item": {k: TypeSerializer().serialize(v) for k,v in body.items()}
+        }
+
+        # Criando um novo item na tabela
+        response = ddb.put_item(**params)
 
         return {
             "statusCode": 200,
-            "body": json.dumps(resp["AuthenticationResult"]),
+            "body": json.dumps("bletag created successfully"),
         }
 
     except Exception as e:

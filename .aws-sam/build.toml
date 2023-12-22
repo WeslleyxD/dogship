@@ -17,7 +17,7 @@ architecture = "arm64"
 handler = "create.lambda_handler"
 manifest_hash = ""
 packagetype = "Zip"
-functions = ["CreatePet", "UpdatePet", "ListPets", "DetailPet", "DeletePet", "AssociateTutorPet", "RemoveAssociateTutorPet", "AssociateResponsiblePet", "RemoveAssociateResponsiblePet"]
+functions = ["UpdatePet", "ListPets", "DetailPet", "DeletePet", "AssociateTutorPet", "RemoveAssociateTutorPet", "AssociateResponsiblePet", "RemoveAssociateResponsiblePet"]
 
 [function_build_definitions.8b20e60e-27a2-4566-9633-00f4261574ca]
 codeuri = "/home/weslley/Projects/Back/backend-mvp/people"
@@ -27,5 +27,14 @@ handler = "create.lambda_handler"
 manifest_hash = ""
 packagetype = "Zip"
 functions = ["CreatePeople", "UpdatePeople", "ListPeople", "DetailPeople", "DeletePeople"]
+
+[function_build_definitions.e4f4f50c-a8b0-4ee3-9382-b9408d2784d2]
+codeuri = "/home/weslley/Projects/Back/backend-mvp/ble"
+runtime = "python3.11"
+architecture = "arm64"
+handler = "create.lambda_handler"
+manifest_hash = ""
+packagetype = "Zip"
+functions = ["CreatePet"]
 
 [layer_build_definitions]
