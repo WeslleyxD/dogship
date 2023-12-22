@@ -1,0 +1,546 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  backend-mvp
+
+  Sample SAM Template for backend-mvp
+
+Globals:
+  Function:
+    Runtime: python3.11
+    Timeout: 10
+    MemorySize: 128
+    Architectures:
+      - arm64
+    Environment:
+      Variables:
+        Region: !Ref AWS::Region
+
+Resources:
+
+  # SECTION COGNITO
+
+  CognitoAuthorizerUserPool:
+    Type: AWS::Cognito::UserPool
+    Properties: 
+      UserPoolName: idp-cognito-mpv
+
+  CognitoAuthorizerUserPoolClient:
+    Type: AWS::Cognito::UserPoolClient
+    DependsOn: CognitoAuthorizerUserPool
+    Properties:
+      ClientName: auth-client
+      GenerateSecret: false
+      UserPoolId: !Ref CognitoAuthorizerUserPool
+      ExplicitAuthFlows:
+        - USER_PASSWORD_AUTH
+        - ADMIN_NO_SRP_AUTH
+
+  # ---
+  MvpRestApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Mvp
+      Auth:
+        DefaultAuthorizer: MvpCognitoAuth
+        Authorizers:
+          MvpCognitoAuth:
+            UserPoolArn: !GetAtt CognitoAuthorizerUserPool.Arn
+
+
+ # SECTION TABLES
+
+  PetsTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: PetsTable
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: petId
+          AttributeType: S
+      KeySchema:
+        - AttributeName: petId
+          KeyType: HASH
+
+  PersonTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: PersonTable
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: personId
+          AttributeType: S
+      KeySchema:
+        - AttributeName: personId
+          KeyType: HASH
+
+
+  BLETagsTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: BLETagsTable
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: tagMac
+          AttributeType: S
+      KeySchema:
+        - AttributeName: tagMac
+          KeyType: HASH
+
+
+  GatewayTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: GatewayTable
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: mac_gateway
+          AttributeType: S
+      KeySchema:
+        - AttributeName: mac_gateway
+          KeyType: HASH
+
+
+  ClientsTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: ClientsTable
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: cnpj
+          AttributeType: S
+      KeySchema:
+        - AttributeName: cnpj
+          KeyType: HASH
+
+
+  SectorsTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: SectorsTable
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: id
+          AttributeType: S
+      KeySchema:
+        - AttributeName: id
+          KeyType: HASH
+
+
+  TagHistoryTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: TagHistoryTable
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: tagMac
+          AttributeType: S
+      KeySchema:
+        - AttributeName: tagMac
+          KeyType: HASH
+
+  AccelerometerDataTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: AccelerometerDataTable
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: tagMac
+          AttributeType: S
+        - AttributeName: timestamp
+          AttributeType: S
+      KeySchema:
+        - AttributeName: tagMac
+          KeyType: HASH
+        - AttributeName: timestamp
+          KeyType: RANGE
+
+  TagStatusDataTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: TagStatusDataTable
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: tagMac
+          AttributeType: S
+        - AttributeName: datetime
+          AttributeType: S
+      KeySchema:
+        - AttributeName: tagMac
+          KeyType: HASH
+        - AttributeName: datetime
+          KeyType: RANGE
+
+  PetActivityProfileTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: PetActivityProfileTable
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: petId
+          AttributeType: S
+        - AttributeName: datetime
+          AttributeType: S
+      KeySchema:
+        - AttributeName: petId
+          KeyType: HASH
+        - AttributeName: datetime
+          KeyType: RANGE
+  # ---
+
+  # SECTION COGNITO USER
+
+  CreateUser:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: cognitouser/
+      Handler: create.lambda_handler
+      Environment:
+        Variables:
+          UserPoolId: !Ref CognitoAuthorizerUserPool
+      Policies:
+        Statement:
+          - Effect: Allow
+            Action:
+              - 'cognito-idp:AdminCreateUser'
+              - 'cognito-idp:AdminSetUserPassword'
+            Resource: 
+              - !GetAtt CognitoAuthorizerUserPool.Arn
+      Events:
+        Auth:
+          Type: Api
+          Properties:
+            Method: POST
+            Path: /create-user
+            RestApiId: 
+              !Ref MvpRestApi
+            Auth:
+              Authorizer: NONE
+
+  AutheUser:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: cognitouser/
+      Handler: auth.lambda_handler
+      Environment:
+        Variables:
+          UserPoolId: !Ref CognitoAuthorizerUserPool
+          ClientId: !Ref CognitoAuthorizerUserPoolClient
+      Policies:
+        Statement:
+          - Effect: Allow
+            Action:
+              - 'cognito-idp:AdminInitiateAuth'
+            Resource: 
+              - !GetAtt CognitoAuthorizerUserPool.Arn
+      Events:
+        Auth:
+          Type: Api
+          Properties:
+            Method: POST
+            Path: /auth-user
+            RestApiId: 
+              !Ref MvpRestApi
+            Auth:
+              Authorizer: NONE
+  # ---
+
+  # SECTION PETS
+
+  CreatePet:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: pets/
+      Handler: create.lambda_handler
+      Environment:
+        Variables:
+          PetsTable: !Ref PetsTable
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref PetsTable
+      Events:
+        Auth:
+          Type: Api
+          Properties:
+            Method: POST
+            Path: /pets
+            RestApiId: 
+              !Ref MvpRestApi
+
+  UpdatePet:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: pets/
+      Handler: update.lambda_handler
+      Environment:
+        Variables:
+          PetsTable: !Ref PetsTable
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref PetsTable
+      Events:
+        Auth:
+          Type: Api
+          Properties:
+            Method: PUT
+            Path: /pets/{petId}
+            RestApiId: 
+              !Ref MvpRestApi
+
+  ListPets:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: pets/
+      Handler: list.lambda_handler
+      Environment:
+        Variables:
+          PetsTable: !Ref PetsTable
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref PetsTable
+      Events:
+        Auth:
+          Type: Api
+          Properties:
+            Method: GET
+            Path: /pets
+            RestApiId: 
+              !Ref MvpRestApi
+
+  DetailPet:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: pets/
+      Handler: detail.lambda_handler
+      Environment:
+        Variables:
+          PetsTable: !Ref PetsTable
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref PetsTable
+      Events:
+        Auth:
+          Type: Api
+          Properties:
+            Method: GET
+            Path: /pets/{petId}
+            RestApiId: 
+              !Ref MvpRestApi
+
+  DeletePet:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: pets/
+      Handler: delete.lambda_handler
+      Environment:
+        Variables:
+          PetsTable: !Ref PetsTable
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref PetsTable
+      Events:
+        Auth:
+          Type: Api
+          Properties:
+            Method: DELETE
+            Path: /pets/{petId}
+            RestApiId: 
+              !Ref MvpRestApi
+
+  AssociateTutorPet:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: pets/
+      Handler: associateTutor.lambda_handler
+      Environment:
+        Variables:
+          PetsTable: !Ref PetsTable
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref PetsTable
+      Events:
+        Auth:
+          Type: Api
+          Properties:
+            Method: POST
+            Path: /pets/{petId}/tutor/{tutorId}
+            RestApiId: 
+              !Ref MvpRestApi
+
+  RemoveAssociateTutorPet:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: pets/
+      Handler: removeAssociateTutor.lambda_handler
+      Environment:
+        Variables:
+          PetsTable: !Ref PetsTable
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref PetsTable
+      Events:
+        Auth:
+          Type: Api
+          Properties:
+            Method: DELETE
+            Path: /pets/{petId}/tutor
+            RestApiId: 
+              !Ref MvpRestApi
+
+  AssociateResponsiblePet:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: pets/
+      Handler: associateResponsible.lambda_handler
+      Environment:
+        Variables:
+          PetsTable: !Ref PetsTable
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref PetsTable
+      Events:
+        Auth:
+          Type: Api
+          Properties:
+            Method: POST
+            Path: /pets/{petId}/responsible/{responsibleId}
+            RestApiId: 
+              !Ref MvpRestApi
+
+  RemoveAssociateResponsiblePet:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: pets/
+      Handler: removeAssociateResponsible.lambda_handler
+      Environment:
+        Variables:
+          PetsTable: !Ref PetsTable
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref PetsTable
+      Events:
+        Auth:
+          Type: Api
+          Properties:
+            Method: DELETE
+            Path: /pets/{petId}/responsible/{responsibleId}
+            RestApiId: 
+              !Ref MvpRestApi
+  # ---
+
+  # SECTION PEOPLE
+
+  CreatePeople:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: people/
+      Handler: create.lambda_handler
+      Environment:
+        Variables:
+          PersonTable: !Ref PersonTable
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref PersonTable
+      Events:
+        Auth:
+          Type: Api
+          Properties:
+            Method: POST
+            Path: /people
+            RestApiId: 
+              !Ref MvpRestApi
+
+  UpdatePeople:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: people/
+      Handler: update.lambda_handler
+      Environment:
+        Variables:
+          PersonTable: !Ref PersonTable
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref PersonTable
+      Events:
+        Auth:
+          Type: Api
+          Properties:
+            Method: PUT
+            Path: /people/{personId}
+            RestApiId: 
+              !Ref MvpRestApi
+
+  ListPeople:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: people/
+      Handler: list.lambda_handler
+      Environment:
+        Variables:
+          PersonTable: !Ref PersonTable
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref PersonTable
+      Events:
+        Auth:
+          Type: Api
+          Properties:
+            Method: GET
+            Path: /people
+            RestApiId: 
+              !Ref MvpRestApi
+
+  DetailPeople:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: people/
+      Handler: detail.lambda_handler
+      Environment:
+        Variables:
+          PersonTable: !Ref PersonTable
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref PersonTable
+      Events:
+        Auth:
+          Type: Api
+          Properties:
+            Method: GET
+            Path: /people/{personId}
+            RestApiId: 
+              !Ref MvpRestApi
+
+  DeletePeople:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: people/
+      Handler: delete.lambda_handler
+      Environment:
+        Variables:
+          PersonTable: !Ref PersonTable
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref PersonTable
+      Events:
+        Auth:
+          Type: Api
+          Properties:
+            Method: DELETE
+            Path: /people/{personId}
+            RestApiId: 
+              !Ref MvpRestApi
+            RequestParameters:
+              - method.request.header.Authorization:
+                  Required: true
+                  Caching: true
+              - method.request.path.personId:
+                  Required: true
+  # ---
+
+
+
+
+Outputs:
+  CognitoAuthorizerUserPool:
+    Description: Cognito Pool
+    Value: !Ref CognitoAuthorizerUserPool
