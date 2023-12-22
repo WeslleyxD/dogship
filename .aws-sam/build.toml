@@ -55,4 +55,13 @@ manifest_hash = ""
 packagetype = "Zip"
 functions = ["CreateClient", "UpdateClient", "ListClients", "DetailClient", "DeleteClient"]
 
+[function_build_definitions.af71c99d-0ea2-492f-89a9-c966a9dec2c8]
+codeuri = "/home/weslley/Projects/Back/backend-mvp/sectors"
+runtime = "python3.11"
+architecture = "arm64"
+handler = "create.lambda_handler"
+manifest_hash = ""
+packagetype = "Zip"
+functions = ["CreateSector", "UpdateSector", "ListSectors", "DetailSector", "DeleteSector"]
+
 [layer_build_definitions]

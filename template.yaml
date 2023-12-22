@@ -894,10 +894,111 @@ Resources:
             Path: /clients/{cnpj}
             RestApiId: 
               !Ref MvpRestApi
-
-
   # ---
 
+
+  # SECTION SECTORS
+
+  CreateSector:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: sectors/
+      Handler: create.lambda_handler
+      Environment:
+        Variables:
+          SectorsTable: !Ref SectorsTable
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref SectorsTable
+      Events:
+        Auth:
+          Type: Api
+          Properties:
+            Method: POST
+            Path: /sectors
+            RestApiId: 
+              !Ref MvpRestApi
+
+  UpdateSector:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: sectors/
+      Handler: update.lambda_handler
+      Environment:
+        Variables:
+          SectorsTable: !Ref SectorsTable
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref SectorsTable
+      Events:
+        Auth:
+          Type: Api
+          Properties:
+            Method: PUT
+            Path: /sectors/{id}
+            RestApiId: 
+              !Ref MvpRestApi
+  
+  ListSectors:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: sectors/
+      Handler: list.lambda_handler
+      Environment:
+        Variables:
+          SectorsTable: !Ref SectorsTable
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref SectorsTable
+      Events:
+        Auth:
+          Type: Api
+          Properties:
+            Method: GET
+            Path: /sectors
+            RestApiId: 
+              !Ref MvpRestApi
+
+  DetailSector:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: sectors/
+      Handler: detail.lambda_handler
+      Environment:
+        Variables:
+          SectorsTable: !Ref SectorsTable
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref SectorsTable
+      Events:
+        Auth:
+          Type: Api
+          Properties:
+            Method: GET
+            Path: /sectors/{id}
+            RestApiId: 
+              !Ref MvpRestApi
+
+  DeleteSector:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: sectors/
+      Handler: delete.lambda_handler
+      Environment:
+        Variables:
+          SectorsTable: !Ref SectorsTable
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref SectorsTable
+      Events:
+        Auth:
+          Type: Api
+          Properties:
+            Method: DELETE
+            Path: /sectors/{id}
+            RestApiId: 
+              !Ref MvpRestApi
+  # ---
 
 
 Outputs:
