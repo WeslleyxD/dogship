@@ -637,6 +637,25 @@ Resources:
               - method.request.path.tagMac:
                   Required: true
 
+  DeleteBle:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: ble/
+      Handler: delete.lambda_handler
+      Environment:
+        Variables:
+          BLETagsTable: !Ref BLETagsTable
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref BLETagsTable
+      Events:
+        Auth:
+          Type: Api
+          Properties:
+            Method: DELETE
+            Path: /tags/{tagMac}
+            RestApiId: 
+              !Ref MvpRestApi
 
   # ---
 
