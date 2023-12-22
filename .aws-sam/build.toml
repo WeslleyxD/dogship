@@ -37,4 +37,13 @@ manifest_hash = ""
 packagetype = "Zip"
 functions = ["CreateBle", "UpdateBle", "UpdateBleBatteryLevel", "ListBle", "DetailBle", "DeleteBle", "AssociateBlePet", "RemoveAssociateBlePet"]
 
+[function_build_definitions.286b0b42-bf74-4ed8-9490-6628dffd0129]
+codeuri = "/home/weslley/Projects/Back/backend-mvp/gateways"
+runtime = "python3.11"
+architecture = "arm64"
+handler = "create.lambda_handler"
+manifest_hash = ""
+packagetype = "Zip"
+functions = ["CreateGateway", "UpdateGateway", "ListGateways", "DetailGateway", "DeleteGateway"]
+
 [layer_build_definitions]

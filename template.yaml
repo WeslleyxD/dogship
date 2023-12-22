@@ -86,7 +86,6 @@ Resources:
         - AttributeName: tagMac
           KeyType: HASH
 
-
   GatewayTable:
     Type: AWS::DynamoDB::Table
     Properties:
@@ -794,9 +793,6 @@ Resources:
             RestApiId: 
               !Ref MvpRestApi
  # ---
-
-
-
 
 Outputs:
   CognitoAuthorizerUserPool:
