@@ -64,4 +64,13 @@ manifest_hash = ""
 packagetype = "Zip"
 functions = ["CreateSector", "UpdateSector", "ListSectors", "DetailSector", "DeleteSector"]
 
+[function_build_definitions.3612c719-54d4-4e45-8586-1c38cf9df9f9]
+codeuri = "/home/weslley/Projects/Back/backend-mvp/taghistory"
+runtime = "python3.11"
+architecture = "arm64"
+handler = "create.lambda_handler"
+manifest_hash = ""
+packagetype = "Zip"
+functions = ["CreateTagHistory", "ListTagHistory"]
+
 [layer_build_definitions]

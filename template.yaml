@@ -129,9 +129,22 @@ Resources:
       AttributeDefinitions:
         - AttributeName: tagMac
           AttributeType: S
+        - AttributeName: petId
+          AttributeType: S
+        - AttributeName: createdAt
+          AttributeType: S
       KeySchema:
         - AttributeName: tagMac
           KeyType: HASH
+      GlobalSecondaryIndexes:
+        - IndexName: petId
+          KeySchema:
+            - AttributeName: petId
+              KeyType: HASH
+            - AttributeName: createdAt
+              KeyType: RANGE
+          Projection:
+            ProjectionType: ALL
 
   AccelerometerDataTable:
     Type: AWS::DynamoDB::Table
@@ -996,6 +1009,49 @@ Resources:
           Properties:
             Method: DELETE
             Path: /sectors/{id}
+            RestApiId: 
+              !Ref MvpRestApi
+  # ---
+
+  # SECTION TAGHISTORY
+
+  CreateTagHistory:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: taghistory/
+      Handler: create.lambda_handler
+      Environment:
+        Variables:
+          TagHistoryTable: !Ref TagHistoryTable
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref TagHistoryTable
+      Events:
+        Auth:
+          Type: Api
+          Properties:
+            Method: POST
+            Path: /createPetTagHistory
+            RestApiId: 
+              !Ref MvpRestApi
+
+  ListTagHistory:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: taghistory/
+      Handler: list.lambda_handler
+      Environment:
+        Variables:
+          TagHistoryTable: !Ref TagHistoryTable
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref TagHistoryTable
+      Events:
+        Auth:
+          Type: Api
+          Properties:
+            Method: GET
+            Path: /listPetTagHistory
             RestApiId: 
               !Ref MvpRestApi
   # ---
